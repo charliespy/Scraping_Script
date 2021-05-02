@@ -2,16 +2,14 @@ import requests
 import json
 import time
 import base64
-import random
-# from github import Github
-# from github import InputGitTreeElement
 
 count = 0
+
 
 def get_all_buildings(school_name):
     school = getSchoolInfo(school_name)
     location = school["location"]
-    APIKEY = "AIzaSyDXUNSnZVRHG9S0aS1SUr_TNz5iQHwgKJo"
+    APIKEY = "AIzaSyCsYNcoCH1QtcagcbPzfwOBetYuv5OA-cs"
     buildings = []
 
     def findPlaces(loc=(location["lat"], location["lng"]), pagetoken=None):
@@ -58,8 +56,9 @@ def get_all_buildings(school_name):
 
     return result
 
+
 def getSchoolInfo(string):
-    request = 'https://maps.googleapis.com/maps/api/place/findplacefromtext/json?key=AIzaSyDXUNSnZVRHG9S0aS1SUr_TNz5iQHwgKJo&input=' + string + '&inputtype=textquery&fields=name,formatted_address,geometry'
+    request = 'https://maps.googleapis.com/maps/api/place/findplacefromtext/json?key=AIzaSyCsYNcoCH1QtcagcbPzfwOBetYuv5OA-cs&input=' + string + '&inputtype=textquery&fields=name,formatted_address,geometry'
     result = requests.get(request)
     result = json.loads(result.text)
     candidates = result["candidates"]
@@ -80,6 +79,7 @@ def getSchoolInfo(string):
     ans["location"] = geo["location"]
     return ans
 
+
 def generateSchoolList(li):
     global count
     timestamp = time.time()
@@ -93,40 +93,6 @@ def generateSchoolList(li):
         count += 1
         print(count, school)
     return array
-
-
-# def pushToRepo():
-#   user = "charliespy"
-#   password = "Monkeysun01"
-#   g = Github(user,password)
-#   print(g)
-#   repo = g.get_user().get_repo("virtualTourProject")
-#   print(repo)
-
-#   file_list = [
-#       'data.json'
-#   ]
-
-#   file_names = [
-#       'data.json'
-#   ]
-#   commit_message = 'first commit from python'
-#   master_ref = repo.get_git_ref('heads/master')
-#   master_sha = master_ref.object.sha
-#   base_tree = repo.get_git_tree(master_sha)
-#   element_list = list()
-#   for i, entry in enumerate(file_list):
-#       with open(entry) as input_file:
-#           data = input_file.read()
-#       if entry.endswith('.png'):
-#           data = base64.b64encode(data)
-#       element = InputGitTreeElement(file_names[i], '100644', 'blob', data)
-#       element_list.append(element)
-#   tree = repo.create_git_tree(element_list, base_tree)
-#   parent = repo.get_git_commit(master_sha)
-#   commit = repo.create_git_commit(commit_message, tree, [parent])
-#   master_ref.edit(commit.sha)
-
 
 
 '''execute part '''
@@ -234,7 +200,6 @@ school_list = [
     "George Mason University",
     "Rutgers - The State University of New Jersey, Newark",
     "Virginia Polytechnic Institute (Virginia Tech)",
-    
     "University of California, Merced (UC Merced)",
     "University of California, Riverside (UC Riverside)",
     "California State University Maritime Academy",
@@ -391,61 +356,80 @@ school_list = [
     "Illinois Institute of Technology",
 ]
 
-schools = [
-    'Andrews University', 
-    'University of Maryland, College Park',
-    'University of West Los Angeles', 
-    'California State University San Marcos',
-    'Starr King School for Ministry', 
-    'University of Pittsburgh',
-    'Claremont Graduate University', 
-    'Vanderbilt University',
-    'University of Illinois, Chicago (UIC)', 
-    'Providence Christian College',
-    'San Jose State University', 
-    'California State University, Los Angeles',
-    'Golden Gate University', 
-    'Epic Bible College',
-    'Fielding Graduate University', 
-    'Biola University',
-    'University of Southern California',
-    'Alliant International University', 
-    'Illinois Institute of Technology',
-    'The Ohio State University'
-] 
 
 # Add the descriptions
 def processing(inp):
-  data = inp
-  for school in data["data"]:
-    for i in range(len(school["buildings"])):
-      if i+1 == len(school["buildings"]):
-        school['buildings'][i]['description2'] = "You have reached the last stop of the tour. Hope you enjoyed. Have a wonderful day!"
-      else:
-        school['buildings'][i]['description2'] = "Your next stop is "+ school['buildings'][i+1]['title']  + '.'
-  return data
+    data = inp
+    for school in data["data"]:
+        for i in range(len(school["buildings"])):
+            if i + 1 == len(school["buildings"]):
+                school['buildings'][i][
+                    'description2'] = "You have reached the last stop of the tour. Hope you enjoyed. Have a wonderful day!"
+            else:
+                school['buildings'][i][
+                    'description2'] = "Your next stop is " + school[
+                        'buildings'][i + 1]['title'] + '.'
+    return data
+
 
 def check_repeat(inp):
-  data = inp
-  for school in data["data"]:
-    li = []
-    index_factor = 0
-    for i in range(len(school["buildings"])-1):
-      lat = float('%.4f'%school['buildings'][i-index_factor]['lat'])
-      lng = float('%.4f'%school['buildings'][i-index_factor]['lng'])
-      school['buildings'][i-index_factor]['lat'] = lat
-      school['buildings'][i-index_factor]['lng'] = lng
-      if {lat:lng} not in li:
-        li.append({lat:lng})
-      else: 
-        school['buildings'].pop(i-index_factor)
-        index_factor += 1
-    print(school['school_name'], index_factor)
-  return data
+    data = inp
+    for school in data["data"]:
+        li = []
+        index_factor = 0
+        for i in range(len(school["buildings"]) - 1):
+            lat = float('%.4f' % school['buildings'][i - index_factor]['lat'])
+            lng = float('%.4f' % school['buildings'][i - index_factor]['lng'])
+            school['buildings'][i - index_factor]['lat'] = lat
+            school['buildings'][i - index_factor]['lng'] = lng
+            if {lat: lng} not in li:
+                li.append({lat: lng})
+            else:
+                school['buildings'].pop(i - index_factor)
+                index_factor += 1
+        print(school['school_name'], index_factor)
+    return data
+
 
 result = generateSchoolList(school_list)
 temporary = check_repeat(result)
 final = processing(temporary)
-with open('data.json', 'w') as outfile:
-  json.dump(final, outfile)
+with open('data5.json', 'w') as outfile:
+    json.dump(final, outfile)
+"""
+dumped parts
+"""
+# from github import Github
+# from github import InputGitTreeElement
 
+# def pushToRepo():
+#   user = "charliespy"
+#   password = "Monkeysun01"
+#   g = Github(user,password)
+#   print(g)
+#   repo = g.get_user().get_repo("virtualTourProject")
+#   print(repo)
+
+#   file_list = [
+#       'data.json'
+#   ]
+
+#   file_names = [
+#       'data.json'
+#   ]
+#   commit_message = 'first commit from python'
+#   master_ref = repo.get_git_ref('heads/master')
+#   master_sha = master_ref.object.sha
+#   base_tree = repo.get_git_tree(master_sha)
+#   element_list = list()
+#   for i, entry in enumerate(file_list):
+#       with open(entry) as input_file:
+#           data = input_file.read()
+#       if entry.endswith('.png'):
+#           data = base64.b64encode(data)
+#       element = InputGitTreeElement(file_names[i], '100644', 'blob', data)
+#       element_list.append(element)
+#   tree = repo.create_git_tree(element_list, base_tree)
+#   parent = repo.get_git_commit(master_sha)
+#   commit = repo.create_git_commit(commit_message, tree, [parent])
+#   master_ref.edit(commit.sha)
